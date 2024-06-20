@@ -38,6 +38,4 @@ if __name__ == "__main__":
 			print("New data point:", s, "- percent change", str(100 * ((i / last100[99]) - 1)) + "% - standard deviation", ((i - mean()) / stdev()))
 			last100.append(i)
 			last100.pop(0)
-		
-		print(d.decode("utf-8"))
 	c.close()
