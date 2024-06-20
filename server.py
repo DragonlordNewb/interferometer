@@ -27,7 +27,7 @@ if __name__ == "__main__":
 	while True:
 		d = c.recv(1024)
 		s = d.decode("utf-8")
-		i = int(s)
+		i = float(s)
 		if not data:
 			print("Connection remotely closed.")
 			break
