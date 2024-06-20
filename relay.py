@@ -34,13 +34,13 @@ if __name__ == "__main__":
 				# Send data to TCP client
 				sock.sendall(data.encode('utf-8'))
 			else:
-				time.sleep(0.1)
+				print("No feed.")
+				time.sleep(1)
 
 	except KeyboardInterrupt:
 		print("Interrupted by user")
 
 	finally:
 		# Clean up
-		connection.close()
-		server_socket.close()
+		sock.close()
 		ser.close()
