@@ -28,9 +28,6 @@ if __name__ == "__main__":
 		d = c.recv(1024)
 		s = d.decode("utf-8")
 		i = float(s)
-		if not data:
-			print("Connection remotely closed.")
-			break
 		if len(last100) < 100:
 			print("\rBuilding up baseline data (" + str(len(last100)) + "%) ...", end="")
 			last100.append(i)
