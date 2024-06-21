@@ -19,12 +19,11 @@ if __name__ == "__main__":
 	sys.stdout.flush()
 	hn = socket.gethostname()
 	ip = socket.gethostbyname(hn)
-	print("done, hostname", hn, "ip", ip, "\nAwaiting connection ...")
+	print("done, hostname", hn, "ip", ip, "\nAwaiting data ...")
 	sock.bind((ip, 7777))
 	d = sock.recvfrom(1024)
-	print("Got connection from", a[0] + ":" + str(a[1]) + ", receiving remote interferometer data ...")
 	while True:
-		d = c.recv(1024)
+		d = sock.recv(1024)
 		s = d.decode("utf-8")
 		i = 0
 		try:
