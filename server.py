@@ -6,7 +6,7 @@ last100 = []
 buildingUp = True
 
 def mean():
-	sum(last100) / 100
+	return sum(last100) / 100
 
 def stdev():
 	return statistics.stdev(last100)
