@@ -12,18 +12,8 @@ if __name__ == "__main__":
 	ser = serial.Serial(sys.argv[2], 9600)
 	print("done.\nLoading socket ...", end="")
 	sys.stdout.flush()
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	print("done.\nConnecting to target ...", end="")
-	sys.stdout.flush()
-	try:
-		sock.connect((sys.argv[1], 7777))
-	except Exception as e:
-		print("error connecting to server:", str(e))
-		if input("Raise error? (y/n) ") == "y":
-			raise e
-		exit(-2)
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	print("done, ready to transmit data.")
-
 
 	ser.readline()
 
@@ -35,7 +25,7 @@ if __name__ == "__main__":
 				print(f"Received from interferometer: {data}")
 				
 				# Send data to TCP client
-				sock.sendall(data.encode('utf-8'))
+				sock.sendto(data.encode('utf-8'), (sys.argv[1], 7777))
 			else:
 				print("No feed.")
 				time.sleep(1)
