@@ -6,7 +6,7 @@ last100 = []
 buildingUp = True
 
 def mean():
-	return str(sum(last100) / 100)
+	sum(last100) / 100
 
 def stdev():
 	return statistics.stdev(last100)
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 			if buildingUp == True:
 				buildingUp = False
 				print("\rCollected baseline data points for analysis.")
-			print("New data point:", s, "- percent change", str(100 * ((i / last100[99]) - 1)) + "% - standard deviation", ((i - mean()) / stdev()))
+			print("New data point:", s, "- percent change", str(100 * ((i / last100[99]) - 1)) + "% - standard deviation", str((i - mean()) / stdev()))
 			last100.append(i)
 			last100.pop(0)
 	c.close()
