@@ -1,6 +1,7 @@
 import socket
 import statistics
 import sys
+import datetime
 
 last100 = []
 buildingUp = True
@@ -10,6 +11,11 @@ def mean():
 
 def stdev():
 	return statistics.stdev(last100)
+
+def current_time_string():
+    now = datetime.datetime.now()
+    formatted_time = now.strftime("%m/%d/%Y %H:%M:%S.%f")[:-3]  # Format as mm/dd/yyyy xx:xx:xx.xxx
+    return formatted_time
 
 if __name__ == "__main__":
 	print("Loading socket ...", end="")
@@ -37,7 +43,10 @@ if __name__ == "__main__":
 			if buildingUp == True:
 				buildingUp = False
 				print("\rCollected baseline data points for analysis.")
-			print("New data point:", s, "- percent change", str(100 * ((i / last100[99]) - 1)) + "% - standard deviation", str((i - mean()) / stdev()))
+			if last100[99] != 0:
+				print(current_time_string(), "\t New data point:", s, "\t\t percent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\t\t standard deviation", str(round((i - mean()) / stdev(), 3)))
+			else:
+				print("Error: interferometer system failure")
 			last100.append(i)
 			last100.pop(0)
 	c.close()
