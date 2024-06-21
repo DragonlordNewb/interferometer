@@ -24,6 +24,9 @@ if __name__ == "__main__":
 		exit(-2)
 	print("done, ready to transmit data.")
 
+
+	ser.readline()
+
 	try:
 		while True:
 			# Read data from Arduino

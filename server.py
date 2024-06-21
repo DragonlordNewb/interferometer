@@ -27,7 +27,11 @@ if __name__ == "__main__":
 	while True:
 		d = c.recv(1024)
 		s = d.decode("utf-8")
-		i = float(s)
+		i = 0
+		try:
+			i = float(s)
+		except:
+			print("Error: corrupted data packet")
 		if len(last100) < 100:
 			print("\rBuilding up baseline data (" + str(len(last100)) + "%) ...", end="")
 			last100.append(i)
