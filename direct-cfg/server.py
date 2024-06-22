@@ -79,28 +79,27 @@ def sig(i):
 	if k > 2:
 		sigi = 0.25
 		return color["red"] + "D" + color["end"]
-	sigi = 0.1
+	sigi = 0
 	return color["purple"] + "F" + color["end"]
 
 def css(i):
 	k = round(sigi * scri * 4, 2)
 
-	if k == 100: return color["bold"] + color["underline"] + color["cyan"] +  "S" + color["end"]
-	if k == 50.0: return color["bold"] + color["cyan"] + "A+" + color["end"]
-	if k == 25.0: return color["bold"] + color["cyan"] + "A" + color["end"]
-	if k == 20: return color["bold"] + color["cyan"] + "A-" + color["end"]
-	if k == 10.0: return color["bold"] + color["green"] + "B+" + color["end"]
-	if k == 5.0: return color["bold"] + color["green"] + "B" + color["end"]
-	if k == 4: return color["bold"] + color["green"] + "B-" + color["end"]
-	if k == 2.5: return color["bold"] + color["yellow"] + "C+" + color["end"]
-	if k == 2.0: return color["bold"] + color["yellow"] + "C" + color["end"]
-	if k == 1.0: return color["bold"] + color["yellow"] + "C-" + color["end"]
-	if k == 0.5: return color["bold"] + color["red"] + "D+" + color["end"]
-	if k == 0.4: return color["bold"] + color["red"] + "D" + color["end"]
-	if k == 0.25: return color["bold"] + color["red"] + "D-" + color["end"]
-	if k == 0.2: return color["bold"] + color["purple"] + "F+" + color["end"]
-	if k == 0.1: return color["bold"] + color["purple"] + "F" + color["end"]
-	return "F-"
+	if k == 100: return color["bold"] + color["underline"] + color["cyan"] +  "S  ███████████████" + color["end"]
+	if k == 50.0: return color["bold"] + color["cyan"] + "A+ ██████████████" + color["end"]
+	if k == 25.0: return color["bold"] + color["cyan"] + "A  █████████████" + color["end"]
+	if k == 20: return color["bold"] + color["cyan"] + "A- ████████████" + color["end"]
+	if k == 10.0: return color["bold"] + color["green"] + "B+ ███████████" + color["end"]
+	if k == 5.0: return color["bold"] + color["green"] + "B  ██████████" + color["end"]
+	if k == 4: return color["bold"] + color["green"] + "B- █████████" + color["end"]
+	if k == 2.5: return color["bold"] + color["yellow"] + "C+ ████████" + color["end"]
+	if k == 2.0: return color["bold"] + color["yellow"] + "C  ███████" + color["end"]
+	if k == 1.0: return color["bold"] + color["yellow"] + "C- ██████" + color["end"]
+	if k == 0.5: return color["bold"] + color["red"] + "D+ █████" + color["end"]
+	if k == 0.4: return color["bold"] + color["red"] + "D  ████" + color["end"]
+	if k == 0.25: return color["bold"] + color["red"] + "D- ███" + color["end"]
+	if k == 0.2: return color["bold"] + color["purple"] + "F+ ██" + color["end"]
+	return color["bold"] + color["purple"] + "F  █" + color["end"]
 
 if __name__ == "__main__":
 	print(color["white"] + "Loading socket ...", end="")
