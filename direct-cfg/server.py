@@ -2,8 +2,11 @@ import socket
 import statistics
 import sys
 import datetime
+import zlib
 
+alldps = []
 last100 = [0, 1]
+overall = 0
 last10 = [10000 for _ in range(10)]
 buildingUp = True
 
@@ -32,6 +35,7 @@ def ts():
 
 sigi = 0
 scri = 0
+starttime = None
 
 def scr():
 	global scri
@@ -111,28 +115,51 @@ if __name__ == "__main__":
 	d = sock.recvfrom(1024)
 	print("Got packet, receiving remote interferometer data ...")
 	while True:
-		d = sock.recv(1024)
-		s = d.decode("utf-8")
-		i = 0
 		try:
-			i = float(s)
-		except:
-			print("Error: corrupted data packet")
-		if len(last100) < 100:
-			print("\rBuilding up baseline data (" + str(len(last100)) + "%) ...", end="")
-			last100.append(i)
-		else:
-			if buildingUp == True:
-				buildingUp = False
-				print("\rCollected baseline data points for analysis.")
-			print(
-				color["white"] + ts(), color["bold"] + "\tNew data point:" + color["end"] + color["white"], s, "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
-				"\tsignificance", sig(i), color["bold"] + color["white"] + "\t\t\tSignal statistics:\tsignal coherence" + color["end"], scr(), color["white"] + "\tmean value", str(round(mean(), 3)), "\taverage std. deviation", 
-				str(round(stdev(), 3)), "\t\t\tcombined statistical significance:", css(i)
-			)
-			last100.append(i)
-			last100.pop(0)
-			last10.append((i - mean()) / stdev())
-			last10.pop(0)
-	c.close()
+			d = sock.recv(1024)
+			s = d.decode("utf-8")
+			i = 0
+			try:
+				i = float(s)
+			except:
+				print("Error: corrupted data packet")
+			if len(last100) < 100:
+				print("\rBuilding up baseline data (" + str(len(last100)) + "%) ...", end="")
+				last100.append(i)
+			else:
+				if buildingUp == True:
+					buildingUp = False
+					starttime = datetime.datetime.now(datetime.UTC).strftime("d%m%d%yt%H%M%S")
+					print("\rCollected baseline data points for analysis.\nStarting session.")
+				else:
+					overall += 1
+					alldps.append(i)
+				print(
+					color["white"] + ts() + "\t", overall, color["bold"] + "\tNew data point:" + color["end"] + color["white"], s, "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
+					"\tsignificance", sig(i), color["bold"] + color["white"] + "\t\tsignal coherence" + color["end"], scr(), color["white"] + "\tmean value", str(round(mean(), 3)), "\taverage std. deviation", 
+					str(round(stdev(), 3)), "\t\t\tcombined statistical significance:", css(i)
+				)
+				last100.append(i)
+				last100.pop(0)
+				last10.append((i - mean()) / stdev())
+				last10.pop(0)
+		except KeyboardInterrupt:
+			print(color["white"] + "Session finished, exporting data ...")
+			dfn = "session_" + starttime + ".interferometer.dat"
+			print("  Data file:", dfn)
+			print("  Data points:", len(alldps))
+			with open(dfn, "x") as f:
+				pass
+			with open(dfn, "a") as f:
+				for n, i in enumerate(alldps):
+					f.write(str(i) + "\n")
+					print("\rWriting data ... (" + str(n+1) + "/" + str(len(alldps)) + " " + str(100 * round((n + 1) / len(alldps), 3)) + "%) ", end="")
+			print("done.                                   \n  Data written. Compressing ...", end="")
+			raw = None
+			with open(dfn, "rb") as f:
+				raw = f.read()
+			with open(dfn, "wb") as f:
+				f.write(zlib.compress(raw))
+			print("done.\nData successfully exported.")
+			break
 	print(color["end"])
