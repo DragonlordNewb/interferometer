@@ -130,12 +130,13 @@ if __name__ == "__main__":
 			else:
 				if buildingUp == True:
 					buildingUp = False
+					starttime = ts()
 					print("\rCollected baseline data points for analysis.\nStarting session.")
 				else:
 					overall += 1
 					alldps.append(s)
 				print(
-					color["white"] + t + starttime + ", " + str(float(t)/1000) + " s\t", overall, color["bold"] + "\tNew data point:" + color["end"] + color["white"], s, "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
+					color["white"] + starttime + ", " + str(float(t)/1000) + " s\t", overall, color["bold"] + "\tNew data point:" + color["end"] + color["white"], s, "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
 					"\tsignificance", sig(i), color["bold"] + color["white"] + "\t\tsignal coherence" + color["end"], scr(), color["white"] + "\tmean value", str(round(mean(), 3)), "\taverage std. deviation", 
 					str(round(stdev(), 3)), "\t\t\tcombined statistical significance:", css(i)
 				)

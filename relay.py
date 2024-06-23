@@ -32,7 +32,7 @@ if __name__ == "__main__":
 					time.sleep(1)
 
 		except KeyboardInterrupt:
-			if input("Continue? (y/n) ") == n:
+			if input("Continue? (y/n) ") == "n":
 				sock.close()
 				ser.close()
 		
