@@ -17,23 +17,22 @@ if __name__ == "__main__":
 
 	ser.readline()
 
-	try:
-		while True:
-			# Read data from Arduino
-			if ser.in_waiting > 0:
-				data = ser.readline().decode('utf-8').strip()
-				print(f"Received from interferometer: {data}")
-				
-				# Send data to TCP client
-				sock.sendto(data.encode('utf-8'), (sys.argv[1], 7777))
-			else:
-				print("No feed.")
-				time.sleep(1)
+	while True:
+		try:
+			while True:
+				# Read data from Arduino
+				if ser.in_waiting > 0:
+					data = ser.readline().decode('utf-8').strip()
+					print(f"Received from interferometer: {data}")
+					
+					# Send data to TCP client
+					sock.sendto(data.encode('utf-8'), (sys.argv[1], 7777))
+				else:
+					print("No feed.")
+					time.sleep(1)
 
-	except KeyboardInterrupt:
-		print("Interrupted by user")
-
-	finally:
-		# Clean up
-		sock.close()
-		ser.close()
+		except KeyboardInterrupt:
+			if input("Continue? (y/n) ") == n:
+				sock.close()
+				ser.close()
+		
