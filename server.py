@@ -119,7 +119,8 @@ if __name__ == "__main__":
 			s = d.decode("utf-8")
 			i = 0
 			try:
-				i = float(s)
+				i = float(s.split(" ")[0])
+				t = s.split(" ")[1]
 			except:
 				print("Error: corrupted data packet")
 			if len(last100) < 100:
@@ -132,9 +133,9 @@ if __name__ == "__main__":
 					print("\rCollected baseline data points for analysis.\nStarting session.")
 				else:
 					overall += 1
-					alldps.append(i)
+					alldps.append(s)
 				print(
-					color["white"] + ts() + "\t", overall, color["bold"] + "\tNew data point:" + color["end"] + color["white"], s, "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
+					color["white"] + ts() + " + " + t + "\t", overall, color["bold"] + "\tNew data point:" + color["end"] + color["white"], s, "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
 					"\tsignificance", sig(i), color["bold"] + color["white"] + "\t\tsignal coherence" + color["end"], scr(), color["white"] + "\tmean value", str(round(mean(), 3)), "\taverage std. deviation", 
 					str(round(stdev(), 3)), "\t\t\tcombined statistical significance:", css(i)
 				)
@@ -154,8 +155,8 @@ if __name__ == "__main__":
 			with open(dfn, "x") as f:
 				pass
 			with open(dfn, "a") as f:
-				for n, i in enumerate(alldps):
-					f.write(str(i) + "\n")
+				for n, s in enumerate(alldps):
+					f.write(s + "\n")
 					print("\rWriting data ... (" + str(n+1) + "/" + str(len(alldps)) + " " + str(100 * round((n + 1) / len(alldps), 3)) + "%) ", end="")
 			print("done.                                   \n  Data written. Compressing ...", end="")
 			raw = None
