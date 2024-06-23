@@ -33,8 +33,12 @@ def stdev():
 def ts():
 	return datetime.datetime.now(datetime.UTC).strftime("%m/%d/%y %H:%M:%S.%f")[:-3] + " UTC"
 
+def sts():
+	return datetime.datetime.now(datetime.UTC).strftime("d%m%d%yt%H%M%S")
+
 sigi = 0
 scri = 0
+stamp = None
 starttime = None
 
 def scr():
@@ -102,7 +106,7 @@ def css(i):
 	return color["bold"] + color["purple"] + "F  █" + color["end"]
 
 if __name__ == "__main__":
-	starttime = datetime.datetime.now(datetime.UTC).strftime("d%m%d%yt%H%M%S")
+	stamp = datetime.datetime.now(datetime.UTC).strftime("d%m%d%yt%H%M%S")
 	print(color["white"] + "Loading socket ...", end="")
 	sys.stdout.flush()
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -136,7 +140,7 @@ if __name__ == "__main__":
 					overall += 1
 					alldps.append(s)
 				print(
-					color["white"] + starttime + ", " + str(float(t)/1000) + " s\t", overall, color["bold"] + "\tNew data point:" + color["end"] + color["white"], s, "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
+					color["white"] + ts() + ", " + str(float(t)/1000) + " s\t", overall, color["bold"] + "\tNew data point:" + color["end"] + color["white"], s, "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
 					"\tsignificance", sig(i), color["bold"] + color["white"] + "\t\tsignal coherence" + color["end"], scr(), color["white"] + "\tmean value", str(round(mean(), 3)), "\taverage std. deviation", 
 					str(round(stdev(), 3)), "\t\t\tcombined statistical significance:", css(i)
 				)
@@ -150,7 +154,7 @@ if __name__ == "__main__":
 			addendum = ""
 			if note != "":
 				addendum = "_" + note
-			dfn = "session_" + starttime + addendum + ".interferometer.dat"
+			dfn = "session_" + stamp + addendum + ".interferometer.dat"
 			print("  Data file:", dfn)
 			print("  Data points:", len(alldps))
 			with open(dfn, "x") as f:
