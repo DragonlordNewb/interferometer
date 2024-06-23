@@ -1,0 +1,9 @@
+if len(sys.argv) != 2:
+		print("Invalid syntax: \"python3 reader.py <filename>\"")
+		exit(-1)
+	raw = None
+	lns = []
+	with open(sys.argv[1], "rb") as f:
+		raw = zlib.decompress(f.read())
+	lns = [float(i.strip()) for i in raw.decode("utf-8").split("\r\n") if i not in ["", " ", "\r", "\n", "\r\n"]]
+	for n in range(len(lns)):

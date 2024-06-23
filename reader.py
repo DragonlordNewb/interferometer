@@ -4,7 +4,6 @@ import sys
 import datetime
 import zlib
 
-alldps = []
 last100 = [0, 1]
 overall = 0
 last10 = [10000 for _ in range(10)]
@@ -31,11 +30,11 @@ def stdev():
 	return statistics.stdev(last100)
 
 def ts():
-	return datetime.datetime.now(datetime.UTC).strftime("%m/%d/%y %H:%M:%S.%f UTC")
+	return datetime.datetime.now(datetime.UTC).strftime("%m/%d/%y %H:%M:%S.%f")[:-3] + " UTC"
 
 sigi = 0
 scri = 0
-starttime = None
+starttime = "Reading file"
 
 def scr():
 	global scri
@@ -109,30 +108,34 @@ if __name__ == "__main__":
 	lns = []
 	with open(sys.argv[1], "rb") as f:
 		raw = zlib.decompress(f.read())
-	lns = [float(i.strip()) for i in raw.decode("utf-8").split("\r\n") if i not in ["", " ", "\r", "\n", "\r\n"]]
+	lns = [i.strip() for i in raw.decode("utf-8").split("\r\n") if i not in ["", " ", "\r", "\n", "\r\n"]]
 	for n in range(len(lns)):
 		try:
-			i = lns[n]
+			try:
+				t = lns[n].split(" ")[1]
+				i = float(lns[n].split(" ")[0])
+			except:
+				print("Error: corrupted data packet")
 			if len(last100) < 100:
+				print("\rBuilding up baseline data (" + str(len(last100)) + "%) ...", end="")
 				last100.append(i)
 			else:
 				if buildingUp == True:
 					buildingUp = False
-					starttime = datetime.datetime.now(datetime.UTC).strftime("d%m%d%yt%H%M%S")
+					print("\rCollected baseline data points for analysis.\nStarting session.")
 				else:
 					overall += 1
-					alldps.append(i)
 				print(
-					color["white"] + ts() + "\t", overall, color["bold"] + "\tNew data point:" + color["end"] + color["white"], str(i), "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
+					color["white"] + t + starttime + ", " + str(float(t)/1000) + " s\t", overall, color["bold"] + "\tNew data point:" + color["end"] + color["white"], str(i), "\tpercent change", str(round(100 * ((i / last100[99]) - 1), 3)) + "%\tstd. deviation", str(round((i - mean()) / stdev(), 3)),
 					"\tsignificance", sig(i), color["bold"] + color["white"] + "\t\tsignal coherence" + color["end"], scr(), color["white"] + "\tmean value", str(round(mean(), 3)), "\taverage std. deviation", 
 					str(round(stdev(), 3)), "\t\t\tcombined statistical significance:", css(i)
 				)
-				if not (n % 50):
-					input()
 				last100.append(i)
 				last100.pop(0)
 				last10.append((i - mean()) / stdev())
 				last10.pop(0)
+				if not (n%50):
+					input()
 		except KeyboardInterrupt:
 			break
 	print(color["end"])
