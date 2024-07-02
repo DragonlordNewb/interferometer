@@ -110,8 +110,8 @@ class InterferometerServer:
                 max_data_value = self.graph_max = max(self.data_points) + 10
                 min_data_value = self.graph_min = min(self.data_points) - 10
             else:
-                max_data_value = self.graph_max = max(max(self.data_points), self.graph_max)
-                min_data_value = self.graph_min = min(min(self.data_points), self.graph_min)
+                max_data_value = self.graph_max = max(max(self.data_points)+10, self.graph_max + 0.01*(max(self.data_points) - self.graph_max))
+                min_data_value = self.graph_min = min(min(self.data_points)-10, self.graph_min + 0.01*(min(self.data_points) - self.graph_min))
             data_range = max_data_value - min_data_value
             data_range = data_range if data_range > 0 else 1  # Avoid division by zero
             

@@ -29,7 +29,7 @@ if __name__ == "__main__":
 					sock.sendto(data.encode('utf-8'), (sys.argv[1], 7777))
 				else:
 					print("No feed.")
-					time.sleep(1)
+					time.sleep(.1)
 
 		except KeyboardInterrupt:
 			if input("Continue? (y/n) ") == "n":
