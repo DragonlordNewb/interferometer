@@ -85,7 +85,7 @@ class DataReader:
 	# Graphing functions #
 
 	def forward(self, evt=None):
-		if index == len(self.df) - 1:
+		if self.index == len(self.df) - 1:
 			return
 		self.index += 1
 		self.all_data = self.df[:self.index + 1]
@@ -93,7 +93,7 @@ class DataReader:
 		self.update_graph()
 
 	def backward(self, evt=None):
-		if index == 0:
+		if self.index == 0:
 			return
 		self.index -= 1
 		self.all_data = self.df[:self.index + 1]
