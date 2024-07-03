@@ -1,19 +1,17 @@
 import tkinter as tk
-import socket
-import select
 import statistics
+import datetime
+import zlib
+import time
+import sys
 
-class InterferometerServer:
-	def __init__(self, root):
+class DataReader:
+	def __init__(self, root, df):
+		self.df = df
+		self.index = 10
 		self.root = root
-		self.root.title("Gravantenna Interferometer Server")
+		self.root.title("Gravantenna Interferometer Data Reader")
 		self.root.configure(bg="black")
-
-		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		hn = socket.gethostname()
-		ip = socket.gethostbyname(hn)
-		self.sock.bind((ip, 7777))
-		self.sock.setblocking(False)
 		
 		### Graphs ###
 
@@ -43,18 +41,22 @@ class InterferometerServer:
 
 		self.max_points_button = tk.Button(self.graph_config_frame, text="Set data range", bg="black", fg="white", font=("OCR A Extended", 12), width=20, command=self.set_max_points)
 		self.max_points_button.grid(row=1, column=2)
-		
+
 		### Data ###
 
-		self.all_data = []
-		self.data_points = []
-		self.percent_changes = []
+		self.all_data = df
+		self.data_points = [0]
+		self.percent_changes = [0]
 
 		self.graph_min = -1
 		self.graph_max = -1
 		
 		### Mainloop ###
 
+		self.root.bind("<Shift_L>", self.forward)
+		self.root.bind("<Control_L>", self.backward)
+		
+		self.forward()
 		self.update_graph()
 
 	### Menus ###
@@ -76,47 +78,46 @@ class InterferometerServer:
 		return statistics.stdev(self.data_points)
 
 	def deviations(self, x):
-		return (x - self.mean()) / self.stdev()
+		if self.stdev() != 0:
+			return (x - self.mean()) / self.stdev()
+		return 0
 
 	# Graphing functions #
 
-	def update_data(self):
-		ready = select.select([self.sock], [], [], 0.01)
-		if ready != ([], [], []):
-			raw_bytes = self.sock.recv(64)
-			raw_string = raw_bytes.decode("utf-8")
-			spl = raw_string.split(" ")
-			new_data = float(spl[0])
-			delta_t = int(spl[1])
-			self.all_data.append(new_data)
-			self.data_points.append(new_data)
-			if len(self.data_points) > 1:
-				percent_change = self.percent_change(new_data)
-				self.percent_changes.append(percent_change)
-			else:
-				self.percent_changes.append(0)  # No percent change for the first data point
-			return True
-		return False
+	def forward(self, evt=None):
+		if index == len(self.df) - 1:
+			return
+		self.index += 1
+		self.all_data = self.df[:self.index + 1]
+		self.data_points = self.df[:self.index + 1][::-1][:self.max_points][::-1]
+		self.update_graph()
+
+	def backward(self, evt=None):
+		if index == 0:
+			return
+		self.index -= 1
+		self.all_data = self.df[:self.index + 1]
+		self.data_points = self.df[:self.index + 1][::-1][:self.max_points][::-1]
+		self.update_graph()
 
 	def update_graph(self):
-		if self.update_data():	
-			# Update label
-			self.new_data_label.config(
-				text=f"Reading:            {self.data_points[-1]}\
-				\nMean:               {round(self.mean(), 3)}\
-				\nStandard deviation: {round(self.stdev(), 3)}\
-				\nPoint deviation:    {round(self.deviations(self.data_points[-1]), 3)}"
-			)
-			
-			# Ensure we only keep the last max_points data points
-			if len(self.data_points) > self.max_points:
-				self.data_points.pop(0)
-				self.percent_changes.pop(0)
-			
-			self.draw_graph()
-			self.draw_percent_change_graph()
+		# Update label
+		self.new_data_label.config(
+			text=f"Reading:            {self.data_points[-1]}\
+			\nMean:               {round(self.mean(), 3)}\
+			\nStandard deviation: {round(self.stdev(), 3)}\
+			\nPoint deviation:    {round(self.deviations(self.data_points[-1]), 3)}"
+		)
 		
-		self.root.after(10, self.update_graph)
+		# Ensure we only keep the last mwax_points data points
+		if len(self.data_points) > self.max_points:
+			self.data_points.pop(0)
+			self.percent_changes.pop(0)
+		
+		self.draw_graph()
+		self.draw_percent_change_graph()
+		
+		# self.root.after(10, self.update_graph)
 
 	def draw_graph(self):
 		self.canvas.delete("all")
@@ -200,6 +201,14 @@ class InterferometerServer:
 		return (new_data - self.data_points[-2]) / self.data_points[-2] * 100
 
 if __name__ == "__main__":
+	if len(sys.argv) != 2:
+		print("Invalid syntax - \"python3 reader.py <filename>\"")
 	root = tk.Tk()
-	app = InterferometerServer(root)
-	root.mainloop()
+	try:
+		with open(sys.argv[1], "rb") as f:
+			df = list(map(float, [x for x in zlib.decompress(f.read()).decode("utf-8").split("\r\n") if x not in ("\r", "\n", "\r\n", "", " ")]))
+		app = DataReader(root, df)
+		root.mainloop()
+	except Exception as e:
+		print("Error reading file:", e)
+		raise e
